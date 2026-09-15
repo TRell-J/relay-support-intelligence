@@ -1,0 +1,196 @@
+@import 'tailwindcss';
+
+/**
+ * Design tokens.
+ *
+ * A deliberately small palette. The discipline that makes a dense operations
+ * console readable is not having more colors — it is that every color means one
+ * thing. Semantic hues appear only to convey state; the accent appears only to
+ * mark an AI recommendation or the active surface.
+ *
+ * Four visual registers must stay distinguishable at a glance:
+ *   operational state   neutral surface, status chip, left rule
+ *   AI recommendation   accent hairline, "Recommended" label, confidence
+ *   human decision      solid controls, highest contrast on the screen
+ *   supporting evidence recessed surface, mono metadata, source cards
+ */
+@theme {
+  /* Canvas and surfaces, darkest to lightest. */
+  --color-canvas: #0b0c0e;
+  --color-surface: #131519;
+  --color-surface-raised: #191c21;
+  --color-surface-sunken: #0f1113;
+  --color-surface-hover: #1e2228;
+
+  /* Warm neutral foregrounds. */
+  --color-fg: #e8e6e3;
+  --color-fg-muted: #a5a29d;
+  /* Raised from #74716c, which measured ~4.1:1 on canvas — below AA for the
+     11px meta text it is used for. This measures ~5.6:1. */
+  --color-fg-subtle: #8b8781;
+  --color-fg-inverse: #0b0c0e;
+
+  /* One controlled accent. */
+  --color-accent: #6c7bff;
+  --color-accent-hover: #8290ff;
+  --color-accent-muted: #2a2f52;
+  --color-accent-fg: #c3caff;
+
+  /* Semantic state. Used only for state, never decoration. */
+  --color-positive: #4ea88a;
+  --color-positive-muted: #1a2f28;
+  --color-caution: #c9973f;
+  --color-caution-muted: #33280f;
+  --color-critical: #d1615d;
+  --color-critical-muted: #351b1b;
+  --color-info: #5b8bb0;
+  --color-info-muted: #16262f;
+
+  /* Hairlines. */
+  --color-border: rgba(255, 255, 255, 0.07);
+  --color-border-strong: rgba(255, 255, 255, 0.13);
+  --color-border-accent: rgba(108, 123, 255, 0.35);
+
+  /* Modest radii. */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  /* One shadow level, used sparingly. */
+  --shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.25);
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', 'Roboto Mono', monospace;
+
+  /* Motion: state change only, never entrance choreography. */
+  --duration-fast: 90ms;
+  --duration-base: 160ms;
+  --ease-out: cubic-bezier(0.2, 0, 0.13, 1);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /**
+   * Every figure in this product is meant to be compared against another figure,
+   * so all numerals are tabular by default rather than opt-in.
+   */
+  body {
+    font-variant-numeric: tabular-nums;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-weight: 560;
+    letter-spacing: -0.011em;
+    color: var(--color-fg);
+  }
+
+  /* Visible focus is a requirement, not a preference (AC-7.5). */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
+  }
+
+  ::selection {
+    background: var(--color-accent-muted);
+    color: var(--color-fg);
+  }
+
+  /* Restrained scrollbars; they appear inside dense panels constantly. */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-border-strong);
+    border-radius: 999px;
+    border: 2px solid var(--color-canvas);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-fg-subtle);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /** Numeric cell: right-aligned, tabular, slightly tightened. */
+  .num {
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    letter-spacing: -0.006em;
+  }
+
+  /** Metadata in evidence contexts: small, mono, subdued. */
+  .meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-fg-subtle);
+    letter-spacing: 0.01em;
+  }
+
+  /**
+   * Register: AI recommendation. An accent hairline on the leading edge, never a
+   * filled panel — a recommendation should be visible without competing with the
+   * human decision next to it.
+   */
+  .register-ai {
+    border-left: 2px solid var(--color-accent);
+    background: linear-gradient(
+      to right,
+      color-mix(in srgb, var(--color-accent) 6%, transparent),
+      transparent 40%
+    );
+  }
+
+  /** Register: supporting evidence. Recessed, quieter than its surroundings. */
+  .register-evidence {
+    background: var(--color-surface-sunken);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+  }
+
+  /** Screen-reader-only utility, for route announcements and table captions. */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+}
