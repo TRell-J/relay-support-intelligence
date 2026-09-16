@@ -251,9 +251,12 @@ function Thread({
   isRetrieving: boolean;
 }) {
   return (
-    // mt-auto pins a short thread to the bottom of the column, the way a chat
-    // surface reads, without breaking scroll once the thread grows past it.
-    <ol className="mt-auto space-y-4" data-testid="conversation-thread">
+    // Anchored to the top, not the bottom. Pinning a short thread to the bottom
+    // reads correctly in a messaging app, where the newest message matters most,
+    // but this column is a record of how a question was answered and it is read
+    // from the beginning. Bottom-pinning also left roughly 550px of empty column
+    // above a two-message exchange, which made a dense tool look unfinished.
+    <ol className="space-y-4" data-testid="conversation-thread">
       {messages.map((message) => (
         <li key={message.id} data-testid={`message-${message.author}`}>
           <div className="flex items-baseline gap-2">
